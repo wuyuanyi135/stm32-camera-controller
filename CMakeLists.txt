@@ -12,7 +12,7 @@ set(AR arm-none-eabi-ar)
 set(OBJCOPY arm-none-eabi-objcopy)
 set(OBJDUMP arm-none-eabi-objdump)
 set(SIZE arm-none-eabi-size)
-
+add_definitions(-DINCLUDE_TEST_COMMANDS)
 
 SET(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F103C8Tx_FLASH.ld)
 

@@ -19,9 +19,9 @@ PT_THREAD(usb_send_daemon(struct pt* pt))
 
 	//PT_TIME_CREATE(pt_time);
 	do {
-		if (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED) {
-			CDC_Transmit_FS(send_buffer, strlen(send_buffer));
-		}
+//		if (hUsbDeviceFS.dev_state == USBD_STATE_CONFIGURED) {
+//			CDC_Transmit_FS(send_buffer, strlen(send_buffer));
+//		}
 
 		PT_TIME_DELAY_TICK(pt, 1000);
 

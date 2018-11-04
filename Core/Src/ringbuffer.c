@@ -37,7 +37,7 @@ ring_buffer_size_t ring_buffer_dequeue(ring_buffer_t *buffer, char *data) {
     return 0;
   }
 
-  if (data == 0) {
+  if (data != 0) {
     *data = buffer->buffer[buffer->tail_index];
   }
   buffer->tail_index = ((buffer->tail_index + 1) & RING_BUFFER_MASK);
