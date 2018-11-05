@@ -69,6 +69,20 @@ PT_THREAD(task_handle_commands(
     static command_handler *handler;
     static command_t command;
     static uint32_t buffer_size;
+
+    // test timeout
+    if (pt_command_parser->starting_time != 0 && HAL_GetTick() - pt_command_parser->starting_time > CMD_RECV_TIMEOUT)
+    {
+        // timeout occurs, clear all items in the ring buffer
+        ring_buffer_dequeue_arr(&recv_buffer, NULL, ring_buffer_num_items(&recv_buffer));
+
+        // clear time tick counter
+        pt_command_parser->starting_time = 0;
+
+        // reset coroutine execution
+        PT_RESTART(pt_command_parser->pt);
+    }
+
     PT_BEGIN(pt_command_parser->pt);
 
     while (1) {
@@ -84,7 +98,8 @@ PT_THREAD(task_handle_commands(
             PT_YIELD(pt_command_parser->pt);
         } else {
             // command handler retrieved successfully
-
+            // store the current tick for timeout detection
+            pt_command_parser->starting_time = HAL_GetTick();
             // yield until required amount of data is in the receive buffer
             buffer_size = handler->bytes_args + sizeof(command_t);
             PT_YIELD_UNTIL(pt_command_parser->pt, buffer_size <= ring_buffer_num_items(&recv_buffer));
@@ -100,6 +115,9 @@ PT_THREAD(task_handle_commands(
                 ring_buffer_dequeue_arr(&recv_buffer, (char *) buffer, (ring_buffer_size_t) buffer_size);
                 handler->callback(handler, buffer, buffer_size);
                 free(buffer);
+
+                // clear tick to prevent raising timeout
+                pt_command_parser->starting_time = 0;
             }
         }
     }

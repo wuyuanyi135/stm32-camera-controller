@@ -49,6 +49,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <command_test.h>
 #include <usb_probe.h>
+#include <commands.h>
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
@@ -118,6 +119,7 @@ int main(void) {
 
     init_command();
     register_test_command();
+    register_commands();
     /* USER CODE END Init */
 
     /* Configure the system clock */

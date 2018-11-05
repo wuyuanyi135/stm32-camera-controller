@@ -20,6 +20,8 @@
 #define COMMAND_OK    1
 #define COMMAND_FAILED 0
 
+#define CMD_RECV_TIMEOUT 50
+
 extern ring_buffer_t recv_buffer;
 
 typedef struct command_handler command_handler;
