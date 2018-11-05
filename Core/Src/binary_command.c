@@ -74,7 +74,7 @@ PT_THREAD(task_handle_commands(
     if (pt_command_parser->starting_time != 0 && HAL_GetTick() - pt_command_parser->starting_time > CMD_RECV_TIMEOUT)
     {
         // timeout occurs, clear all items in the ring buffer
-        ring_buffer_dequeue_arr(&recv_buffer, NULL, ring_buffer_num_items(&recv_buffer));
+        ring_buffer_dequeue_arr(&recv_buffer, 0, ring_buffer_num_items(&recv_buffer));
 
         // clear time tick counter
         pt_command_parser->starting_time = 0;
@@ -113,7 +113,7 @@ PT_THREAD(task_handle_commands(
             else
             {
                 ring_buffer_dequeue_arr(&recv_buffer, (char *) buffer, (ring_buffer_size_t) buffer_size);
-                handler->callback(handler, buffer, buffer_size);
+                handler->callback(handler, buffer+ sizeof (command_t), handler->bytes_args);
                 free(buffer);
 
                 // clear tick to prevent raising timeout
