@@ -4,5 +4,5 @@
 
 #include "parameters.h"
 
-uint32_t param_exposure_time;
-uint32_t param_timeout;
+uint32_t param_exposure_time = 20;
+uint32_t param_timeout = PARAM_TIMEOUT_MAX;
