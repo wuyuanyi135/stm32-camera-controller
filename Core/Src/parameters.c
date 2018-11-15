@@ -4,5 +4,6 @@
 
 #include "parameters.h"
 
-uint32_t param_exposure_time = 20;
-uint32_t param_timeout = PARAM_TIMEOUT_MAX;
+uint16_t param_exposure_time = 72 * 20;
+uint16_t param_digital_filter = 0;
+uint16_t param_pulse_delay = 1;

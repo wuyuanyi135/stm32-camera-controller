@@ -50,6 +50,8 @@
 #include <command_test.h>
 #include <usb_probe.h>
 #include <commands.h>
+#include <trigger.h>
+#include <parameters.h>
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
@@ -80,8 +82,6 @@ static void MX_DMA_Init(void);
 
 static void MX_TIM2_Init(void);
 
-static void MX_TIM3_Init(void);
-
 static void MX_NVIC_Init(void);
 
 /* USER CODE BEGIN PFP */
@@ -99,70 +99,68 @@ static void MX_NVIC_Init(void);
   * @retval None
   */
 int main(void) {
-    /* USER CODE BEGIN 1 */
+  /* USER CODE BEGIN 1 */
 
-    /* USER CODE END 1 */
+  /* USER CODE END 1 */
 
-    /* MCU Configuration----------------------------------------------------------*/
+  /* MCU Configuration----------------------------------------------------------*/
 
-    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-    HAL_Init();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-    /* USER CODE BEGIN Init */
-    static struct pt pt_usb_comm, pt_task_monitor, pt_command_parser;
-    static struct pt_command_parser command_parser;
-    command_parser.pt = &pt_command_parser;
+  /* USER CODE BEGIN Init */
+  static struct pt pt_usb_comm, pt_task_monitor, pt_command_parser;
+  static struct pt_command_parser command_parser;
+  command_parser.pt = &pt_command_parser;
 
-    PT_INIT(&pt_command_parser);
-    PT_INIT(&pt_usb_comm);
-    PT_INIT(&pt_task_monitor);
+  PT_INIT(&pt_command_parser);
+  PT_INIT(&pt_usb_comm);
+  PT_INIT(&pt_task_monitor);
 
-    init_command();
-    register_test_command();
-    register_commands();
-    /* USER CODE END Init */
+  init_command();
+  register_test_command();
+  register_commands();
+  /* USER CODE END Init */
 
-    /* Configure the system clock */
-    SystemClock_Config();
+  /* Configure the system clock */
+  SystemClock_Config();
 
-    /* USER CODE BEGIN SysInit */
+  /* USER CODE BEGIN SysInit */
 
-    /* USER CODE END SysInit */
+  /* USER CODE END SysInit */
 
-    /* Initialize all configured peripherals */
-    MX_GPIO_Init();
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
 
-    // trigger the reenumeration first in case the usb is plugged in before reset.
-    usb_reenumerate();
+  // trigger the reenumeration first in case the usb is plugged in before reset.
+  usb_reenumerate();
 
-    MX_DMA_Init();
-    MX_USB_DEVICE_Init();
-    MX_TIM2_Init();
-    MX_TIM3_Init();
+  MX_DMA_Init();
+  MX_USB_DEVICE_Init();
+  MX_TIM2_Init();
 
-    /* Initialize interrupts */
-    MX_NVIC_Init();
-    /* USER CODE BEGIN 2 */
-    led_init();
-    led_always(LED_OFF);
-    /* USER CODE END 2 */
+  /* Initialize interrupts */
+  MX_NVIC_Init();
+  /* USER CODE BEGIN 2 */
+  led_init();
+  led_always(LED_OFF);
+  /* USER CODE END 2 */
 
-    /* Infinite loop */
-    /* USER CODE BEGIN WHILE */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
 
+  while (1) {
+    usb_send_daemon(&pt_usb_comm);
+    task_led_strobe();
+    task_monitor_cdc_connection(&pt_task_monitor);
+    task_handle_commands(&command_parser);
 
-    while (1) {
-        usb_send_daemon(&pt_usb_comm);
-        task_led_strobe();
-        task_monitor_cdc_connection(&pt_task_monitor);
-        task_handle_commands(&command_parser);
+    /* USER CODE END WHILE */
 
-        /* USER CODE END WHILE */
+    /* USER CODE BEGIN 3 */
 
-        /* USER CODE BEGIN 3 */
-
-    }
-    /* USER CODE END 3 */
+  }
+  /* USER CODE END 3 */
 
 }
 
@@ -172,52 +170,52 @@ int main(void) {
   */
 void SystemClock_Config(void) {
 
-    RCC_OscInitTypeDef RCC_OscInitStruct;
-    RCC_ClkInitTypeDef RCC_ClkInitStruct;
-    RCC_PeriphCLKInitTypeDef PeriphClkInit;
+  RCC_OscInitTypeDef RCC_OscInitStruct;
+  RCC_ClkInitTypeDef RCC_ClkInitStruct;
+  RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
-    /**Initializes the CPU, AHB and APB busses clocks 
-    */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-    RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
-    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
+  /**Initializes the CPU, AHB and APB busses clocks
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
-    /**Initializes the CPU, AHB and APB busses clocks 
-    */
-    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-                                  | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  /**Initializes the CPU, AHB and APB busses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+      | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
-    PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
-    if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK) {
+    _Error_Handler(__FILE__, __LINE__);
+  }
 
-    /**Configure the Systick interrupt time 
-    */
-    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
+  /**Configure the Systick interrupt time
+  */
+  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
 
-    /**Configure the Systick 
-    */
-    HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+  /**Configure the Systick
+  */
+  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
-    /* SysTick_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+  /* SysTick_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
 /**
@@ -225,90 +223,26 @@ void SystemClock_Config(void) {
   * @retval None
   */
 static void MX_NVIC_Init(void) {
-    /* TIM3_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(TIM3_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(TIM3_IRQn);
+  HAL_NVIC_SetPriority(TIM2_IRQn, 1, 0);
+  HAL_NVIC_EnableIRQ(TIM2_IRQn);
 }
 
 /* TIM2 init function */
 static void MX_TIM2_Init(void) {
-
-    TIM_ClockConfigTypeDef sClockSourceConfig;
-    TIM_SlaveConfigTypeDef sSlaveConfig;
-    TIM_MasterConfigTypeDef sMasterConfig;
-
-    htim2.Instance = TIM2;
-    htim2.Init.Prescaler = 0;
-    htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim2.Init.Period = 0;
-    htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-    htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    if (HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
-
-    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-    if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
-
-    sSlaveConfig.SlaveMode = TIM_SLAVEMODE_TRIGGER;
-    sSlaveConfig.InputTrigger = TIM_TS_ETRF;
-    sSlaveConfig.TriggerPolarity = TIM_TRIGGERPOLARITY_NONINVERTED;
-    sSlaveConfig.TriggerPrescaler = TIM_TRIGGERPRESCALER_DIV1;
-    sSlaveConfig.TriggerFilter = 0;
-    if (HAL_TIM_SlaveConfigSynchronization(&htim2, &sSlaveConfig) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
-
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-    if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
-
-}
-
-/* TIM3 init function */
-static void MX_TIM3_Init(void) {
-
-    TIM_ClockConfigTypeDef sClockSourceConfig;
-    TIM_MasterConfigTypeDef sMasterConfig;
-
-    htim3.Instance = TIM3;
-    htim3.Init.Prescaler = 0;
-    htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim3.Init.Period = 72;
-    htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-    htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    if (HAL_TIM_Base_Init(&htim3) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
-
-    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-    if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
-
-    sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-    sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-    if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK) {
-        _Error_Handler(__FILE__, __LINE__);
-    }
-
+  configure_trigger();
 }
 
 /** 
   * Enable DMA controller clock
   */
 static void MX_DMA_Init(void) {
-    /* DMA controller clock enable */
-    __HAL_RCC_DMA1_CLK_ENABLE();
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
 
-    /* DMA interrupt init */
-    /* DMA1_Channel2_IRQn interrupt configuration */
-    HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+  /* DMA interrupt init */
+  /* DMA1_Channel2_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
 
 }
 
@@ -321,11 +255,33 @@ static void MX_DMA_Init(void) {
 */
 static void MX_GPIO_Init(void) {
 
-    /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOD_CLK_ENABLE();
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
 
+  GPIO_InitTypeDef trigger_gpio_init = {
+      .Mode = GPIO_MODE_AF_INPUT,
+      .Speed = GPIO_SPEED_FREQ_HIGH,
+      .Pull = GPIO_NOPULL,
+      .Pin = GPIO_PIN_0
+  };
+  HAL_GPIO_Init(GPIOA, &trigger_gpio_init);
+  GPIO_InitTypeDef output_gpio_init = {
+      .Mode = GPIO_MODE_AF_PP,
+      .Speed = GPIO_SPEED_FREQ_HIGH,
+      .Pull = GPIO_NOPULL,
+      .Pin = GPIO_PIN_1
+  };
+  HAL_GPIO_Init(GPIOA, &output_gpio_init);
+
+  GPIO_InitTypeDef power_gpio_init = {
+      .Mode = GPIO_MODE_OUTPUT_PP,
+      .Speed = GPIO_SPEED_FREQ_LOW,
+      .Pull = GPIO_NOPULL,
+      .Pin = GPIO_PIN_7
+  };
+  HAL_GPIO_Init(GPIOA, &power_gpio_init);
 }
 
 /* USER CODE BEGIN 4 */
@@ -339,11 +295,11 @@ static void MX_GPIO_Init(void) {
   * @retval None
   */
 void _Error_Handler(char *file, int line) {
-    /* USER CODE BEGIN Error_Handler_Debug */
-    /* User can add his own implementation to report the HAL error return state */
-    while (1) {
-    }
-    /* USER CODE END Error_Handler_Debug */
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  while (1) {
+  }
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT

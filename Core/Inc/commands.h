@@ -16,11 +16,19 @@
 #define COMMAND_ARM_TRIGGER_0_0 (0x40)
 #define COMMAND_CANCEL_TRIGGER_0_0 (0x41)
 
-#define COMMAND_SET_TIMEOUT_4_0 (0x42)
-#define COMMAND_GET_TIMEOUT_0_4 (0x43)
+#define COMMAND_SET_FILTER_2_0 (0x42)
+#define COMMAND_GET_FILTER_0_2 (0x43)
 
-#define COMMAND_SET_EXPOSURE_4_0 (0x44)
-#define COMMAND_GET_EXPOSURE_0_4 (0x45)
+#define COMMAND_SET_EXPOSURE_2_0 (0x44)
+#define COMMAND_GET_EXPOSURE_0_2 (0x45)
+
+#define COMMAND_SET_DELAY_2_0 (0x46)
+#define COMMAND_GET_DELAY_0_2 (0x47)
+
+#define COMMAND_COMMIT_PARAMETERS_0_0 (0x50)
+
+#define COMMAND_SET_POWER_1_0 (0x30)
+#define COMMAND_GET_POWER_0_1 (0x31)
 
 /* return the last error. frame structure:
  * 0-3: millisecond timestamp. zero if no error occured

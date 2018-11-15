@@ -7,8 +7,16 @@
 
 #include "stm32f1xx.h"
 
-#define PARAM_TIMEOUT_MAX   (50000L)   // max laser on time 50 microseconds
-extern uint32_t param_exposure_time;
-extern uint32_t param_timeout;
+#define PARAM_DIGITAL_FILTER_MIN  0
+#define PARAM_DIGITAL_FILTER_MAX  0xffff
+extern uint16_t param_digital_filter;
+
+#define PARAM_PULSE_DELAY_MIN  1
+#define PARAM_PULSE_DELAY_MAX  0xffff
+extern uint16_t param_pulse_delay;
+
+#define PARAM_EXPOSURE_TIME_MIN 0
+#define PARAM_EXPOSURE_TIME_MAX 0xffff
+extern uint16_t param_exposure_time;
 
 #endif //STM32_CAMERA_CONTROLLER_PARAMETERS_H
