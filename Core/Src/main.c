@@ -149,7 +149,6 @@ int main(void) {
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  app_map[0].callback(NULL, NULL, 0);
   while (1) {
     usb_send_daemon(&pt_usb_comm);
     task_led_strobe();

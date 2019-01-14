@@ -14,8 +14,8 @@
 
 extern char const *_app_start;
 
-extern uint32_t APP_VARIABLE app_map_size;
-extern command_handler APP_VARIABLE app_map[];
+extern uint32_t app_map_size;
+extern command_handler app_map[];
 
-extern void APP_FUNCTION app_init();
+extern void app_init();
 #endif //STM32_CAMERA_CONTROLLER_APP_H

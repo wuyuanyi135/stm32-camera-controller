@@ -173,17 +173,23 @@ SECTIONS
     KEEP(*(.app_rodata))
     . = ALIGN(4);
   } >APPFLASH
+  /* used by the startup to initialize data */
+  _siappdata = LOADADDR(.app_data);
   .app_data :
   {
     . = ALIGN(4);
+    _sappdata = .;
     KEEP(*(.app_data))           /* .data sections */
     . = ALIGN(4);
+    _eappdata = .;
   } >RAM AT> APPFLASH
   .app :
   {
+    _sapptext = .;
     . = ALIGN(4);
     KEEP(*(.app_text))
     . = ALIGN(4);
+    _eapptext = .;
   } >APPFLASH
 }
 

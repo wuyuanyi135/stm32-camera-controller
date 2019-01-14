@@ -16,7 +16,7 @@ void APP_FUNCTION app_test(command_handler *cmd, uint8_t *buffer, uint32_t lengt
   i++;
 };
 
-command_handler APP_VARIABLE app_map[] = {
+command_handler app_map[] APP_VARIABLE = {
     {
         .command = APP_TEST_COMMAND_0_0,
         .bytes_args = 0,
@@ -25,4 +25,4 @@ command_handler APP_VARIABLE app_map[] = {
         .initialized = 1,
     }
 };
-uint32_t APP_VARIABLE app_map_size = sizeof(app_map) / sizeof(command_handler);
+uint32_t app_map_size APP_VARIABLE = sizeof(app_map) / sizeof(command_handler);
