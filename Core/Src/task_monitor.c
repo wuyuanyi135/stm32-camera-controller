@@ -8,7 +8,7 @@
 
 #define PERSISTED(NEW, OLD, EXEC) if (NEW != OLD) {EXEC;OLD = NEW;}
 
-const uint32_t strobing_sequence[] =
+uint32_t strobing_sequence[] =
 { 200, 200, 400, 200, 1000, 200 };
 
 void update_cdc_state ()

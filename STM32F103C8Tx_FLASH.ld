@@ -42,7 +42,8 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 MEMORY
 {
 RAM (xrw)      : ORIGIN = 0x20000000, LENGTH = 20K
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 64K
+FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 40K
+APPFLASH(rx)    : ORIGIN = 0x800A000, LENGTH = 24K
 }
 
 /* Define output sections */
@@ -164,6 +165,26 @@ SECTIONS
   }
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
+
+  .app_rodata :
+  {
+    PROVIDE(_app_start = .);
+    . = ALIGN(4);
+    KEEP(*(.app_rodata))
+    . = ALIGN(4);
+  } >APPFLASH
+  .app_data :
+  {
+    . = ALIGN(4);
+    KEEP(*(.app_data))           /* .data sections */
+    . = ALIGN(4);
+  } >RAM AT> APPFLASH
+  .app :
+  {
+    . = ALIGN(4);
+    KEEP(*(.app_text))
+    . = ALIGN(4);
+  } >APPFLASH
 }
 
 

@@ -59,6 +59,7 @@
 #include "usb_comm.h"
 #include "led_status.h"
 #include "task_monitor.h"
+#include "app.h"
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
@@ -148,7 +149,7 @@ int main(void) {
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
+  app_map[0].callback(NULL, NULL, 0);
   while (1) {
     usb_send_daemon(&pt_usb_comm);
     task_led_strobe();
