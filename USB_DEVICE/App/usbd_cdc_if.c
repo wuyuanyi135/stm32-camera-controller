@@ -49,6 +49,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <binary_command.h>
+#include <text_command.h>
 #include "usbd_cdc_if.h"
 #include "usbd_cdc_extension.h"
 
@@ -294,7 +295,11 @@ static int8_t CDC_Receive_FS(uint8_t *Buf, uint32_t *Len) {
     USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
     USBD_CDC_ReceivePacket(&hUsbDeviceFS);
 
+#ifdef USE_BINARY_COMMAND
     feed(Buf, (uint8_t) *Len);
+#else
+    text_feed(Buf, (uint8_t) *Len);
+#endif
     return (USBD_OK);
     /* USER CODE END 6 */
 }

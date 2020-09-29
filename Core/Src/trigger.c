@@ -39,7 +39,7 @@ void configure_trigger() {
       .ICSelection = TIM_ICSELECTION_DIRECTTI,
       .ICPolarity = TIM_ICPOLARITY_FALLING,  // stm32f1 only support detecting either edge
       .ICFilter = param_digital_filter,
-      .OCPolarity = TIM_OCPOLARITY_HIGH,
+      .OCPolarity = param_polarity ? TIM_OCPOLARITY_LOW : TIM_OCPOLARITY_HIGH,
       .OCMode = TIM_OCMODE_PWM2,
       .Pulse = param_pulse_delay  // AT LEAST 1
   };

@@ -6,8 +6,8 @@
 #define STM32_CAMERA_CONTROLLER_TRIGGER_H
 #include "stm32f1xx.h"
 typedef enum {
-  Enabled,
-  Disabled
+  Disabled,
+  Enabled
 } TriggerStates;
 extern TriggerStates trigger_state;
 void arm_trigger();

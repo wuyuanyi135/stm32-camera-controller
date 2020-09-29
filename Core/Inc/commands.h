@@ -30,6 +30,8 @@
 #define COMMAND_SET_POWER_1_0 (0x30)
 #define COMMAND_GET_POWER_0_1 (0x31)
 
+#define COMMAND_SET_POLARITY_1_0 (0x60)
+#define COMMAND_GET_POLARITY_0_1 (0x61)
 /* return the last error. frame structure:
  * 0-3: millisecond timestamp. zero if no error occured
  * 4-7: error id

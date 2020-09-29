@@ -7,7 +7,6 @@
 
 #ifndef INC_BINARY_COMMAND_H_
 #define INC_BINARY_COMMAND_H_
-
 #include "ringbuffer.h"
 #include "pt/pt.h"
 

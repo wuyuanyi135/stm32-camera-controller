@@ -52,6 +52,8 @@
 #include <commands.h>
 #include <trigger.h>
 #include <parameters.h>
+#include <text_command.h>
+#include <text_commands.h>
 #include "main.h"
 #include "stm32f1xx_hal.h"
 #include "usb_device.h"
@@ -111,16 +113,27 @@ int main(void) {
 
   /* USER CODE BEGIN Init */
   static struct pt pt_usb_comm, pt_task_monitor, pt_command_parser;
+
+#ifdef USE_BINARY_COMMAND
   static struct pt_command_parser command_parser;
   command_parser.pt = &pt_command_parser;
+#else
+  static struct pt_text_command_parser text_command_parser;
+  text_command_parser.pt = &pt_command_parser;
+#endif
 
   PT_INIT(&pt_command_parser);
   PT_INIT(&pt_usb_comm);
   PT_INIT(&pt_task_monitor);
-
+#ifdef USE_BINARY_COMMAND
   init_command();
   register_test_command();
   register_commands();
+#else
+  text_init_command();
+  text_register_commands();
+
+#endif
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -153,7 +166,12 @@ int main(void) {
     usb_send_daemon(&pt_usb_comm);
     task_led_strobe();
     task_monitor_cdc_connection(&pt_task_monitor);
+
+#ifdef USE_BINARY_COMMAND
     task_handle_commands(&command_parser);
+#else
+    task_handle_text_commands(&text_command_parser);
+#endif
 
     /* USER CODE END WHILE */
 

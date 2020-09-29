@@ -3,7 +3,7 @@
 //
 
 #include "command_test.h"
-
+#ifdef USE_BINARY_COMMAND
 #ifdef INCLUDE_TEST_COMMANDS
 void test_command_0_cb(command_handler* cmd, uint8_t *buffer, uint32_t length)
 {
@@ -18,3 +18,4 @@ void register_test_command()
     register_command(TEST_COMMAND_0, 0, 2, test_command_0_cb);
 #endif
 }
+#endif

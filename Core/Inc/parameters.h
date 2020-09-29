@@ -19,4 +19,7 @@ extern uint16_t param_pulse_delay;
 #define PARAM_EXPOSURE_TIME_MAX 0xffff
 extern uint16_t param_exposure_time;
 
+#define PARAM_POLARITY_MIN 0
+#define PARAM_POLARITY_MAX 1
+extern uint8_t  param_polarity;
 #endif //STM32_CAMERA_CONTROLLER_PARAMETERS_H

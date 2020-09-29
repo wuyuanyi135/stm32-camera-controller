@@ -2,6 +2,8 @@
 // Created by wuyuanyi on 04/11/18.
 //
 
+#ifdef USE_BINARY_COMMAND
+
 #include <stm32f1xx.h>
 #include <parameters.h>
 #include <string.h>
@@ -24,10 +26,16 @@ void setter_uint16(const uint16_t *src, uint16_t *target, uint16_t min, uint16_t
   if (target == NULL || src == NULL)
     return;
 
-  if (*src > min && *src < max)
+  if (*src >= min && *src <= max)
     *target = *src;
 }
+void setter_uint8(const uint8_t *src, uint8_t *target, uint8_t min, uint8_t max) {
+  if (target == NULL || src == NULL)
+    return;
 
+  if (*src >= min && *src <= max)
+    *target = *src;
+}
 void command_set_exposure_callback(command_handler *cmd, uint8_t *buffer, uint32_t length) {
   setter_uint16((const uint16_t *) buffer, &param_exposure_time, PARAM_EXPOSURE_TIME_MIN, PARAM_EXPOSURE_TIME_MAX);
   invoke(cmd, &cmd->command);
@@ -92,6 +100,16 @@ void command_get_power_callback(command_handler *cmd, uint8_t *buffer, uint32_t 
   memcpy(response + 1, &power_state, sizeof(power_state));
   invoke(cmd, response);
 }
+void command_set_polarity_callback(command_handler *cmd, uint8_t *buffer, uint32_t length) {
+  setter_uint8(buffer, &param_polarity, PARAM_POLARITY_MIN, PARAM_POLARITY_MAX);
+  invoke(cmd, &cmd->command);
+}
+void command_get_polarity_callback(command_handler *cmd, uint8_t *buffer, uint32_t length) {
+  uint8_t response[2];
+  response[0] = cmd->command;
+  memcpy(response + 1, &param_polarity, sizeof(param_polarity));
+  invoke(cmd, response);
+}
 void register_commands() {
   register_command((command_t) COMMAND_VERSION_0_2, 0, 2, command_version_callback);
   register_command((command_t) COMMAND_RESET_0_0, 0, 0, command_reset_callback);
@@ -106,4 +124,8 @@ void register_commands() {
   register_command((command_t) COMMAND_CANCEL_TRIGGER_0_0, 0, 0, command_cancel_trigger_callback);
   register_command((command_t) COMMAND_SET_POWER_1_0, 1, 0, command_set_power_callback);
   register_command((command_t) COMMAND_GET_POWER_0_1, 0, 1, command_get_power_callback);
+  register_command((command_t) COMMAND_SET_POLARITY_1_0, 1, 0, command_set_polarity_callback);
+  register_command((command_t) COMMAND_GET_POLARITY_0_1, 0, 1, command_get_polarity_callback);
 }
+
+#endif
