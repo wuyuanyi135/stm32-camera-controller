@@ -272,34 +272,32 @@ static void MX_DMA_Init(void) {
         * EXTI
 */
 static void MX_GPIO_Init(void) {
-
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOD_CLK_ENABLE();
+  //  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
-  GPIO_InitTypeDef trigger_gpio_init = {
-      .Mode = GPIO_MODE_AF_INPUT,
-      .Speed = GPIO_SPEED_FREQ_HIGH,
-      .Pull = GPIO_NOPULL,
-      .Pin = GPIO_PIN_0
-  };
+  GPIO_InitTypeDef trigger_gpio_init = {.Mode = GPIO_MODE_INPUT,
+                                        .Speed = GPIO_SPEED_FREQ_HIGH,
+                                        .Pull = GPIO_NOPULL,
+                                        .Pin = GPIO_PIN_15};
   HAL_GPIO_Init(GPIOA, &trigger_gpio_init);
-  GPIO_InitTypeDef output_gpio_init = {
-      .Mode = GPIO_MODE_AF_PP,
-      .Speed = GPIO_SPEED_FREQ_HIGH,
-      .Pull = GPIO_NOPULL,
-      .Pin = GPIO_PIN_1
-  };
-  HAL_GPIO_Init(GPIOA, &output_gpio_init);
+  GPIO_InitTypeDef output_gpio_init = {.Mode = GPIO_MODE_AF_PP,
+                                       .Speed = GPIO_SPEED_FREQ_HIGH,
+                                       .Pull = GPIO_NOPULL,
+                                       .Pin = GPIO_PIN_3};
 
-  GPIO_InitTypeDef power_gpio_init = {
-      .Mode = GPIO_MODE_OUTPUT_PP,
-      .Speed = GPIO_SPEED_FREQ_LOW,
-      .Pull = GPIO_NOPULL,
-      .Pin = GPIO_PIN_7
-  };
-  HAL_GPIO_Init(GPIOA, &power_gpio_init);
+  HAL_GPIO_Init(GPIOB, &output_gpio_init);
+  __HAL_AFIO_REMAP_TIM2_PARTIAL_1();
+
+  //  GPIO_InitTypeDef power_gpio_init = {
+  //      .Mode = GPIO_MODE_OUTPUT_PP,
+  //      .Speed = GPIO_SPEED_FREQ_LOW,
+  //      .Pull = GPIO_NOPULL,
+  //      .Pin = GPIO_PIN_7
+  //  };
+  //  HAL_GPIO_Init(GPIOA, &power_gpio_init);
 }
 
 /* USER CODE BEGIN 4 */

@@ -59,7 +59,7 @@
 
 /* Private define ------------------------------------------------------------*/
 
-#define Camera_exposure_signal_Pin GPIO_PIN_0
+#define Camera_exposure_signal_Pin GPIO_PIN_15
 #define Camera_exposure_signal_GPIO_Port GPIOA
 
 /* ########################## Assert Selection ############################## */

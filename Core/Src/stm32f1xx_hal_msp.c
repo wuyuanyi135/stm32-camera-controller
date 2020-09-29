@@ -102,28 +102,33 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
   /* USER CODE BEGIN TIM2_MspInit 0 */
 
   /* USER CODE END TIM2_MspInit 0 */
-    /* Peripheral clock enable */
-    __HAL_RCC_TIM2_CLK_ENABLE();
-  
-    /**TIM2 GPIO Configuration    
-    PA0-WKUP     ------> TIM2_ETR 
-    */
-    GPIO_InitStruct.Pin = Camera_exposure_signal_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    HAL_GPIO_Init(Camera_exposure_signal_GPIO_Port, &GPIO_InitStruct);
+  /* Peripheral clock enable */
+  __HAL_RCC_TIM2_CLK_ENABLE();
 
-    /* TIM2 DMA Init */
-    /* TIM2_UP Init */
-    hdma_tim2_up.Instance = DMA1_Channel2;
-    hdma_tim2_up.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_tim2_up.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_tim2_up.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_tim2_up.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_tim2_up.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_tim2_up.Init.Mode = DMA_NORMAL;
-    hdma_tim2_up.Init.Priority = DMA_PRIORITY_VERY_HIGH;
-    if (HAL_DMA_Init(&hdma_tim2_up) != HAL_OK)
+  /**TIM2 GPIO Configuration
+  PA0-WKUP     ------> TIM2_ETR
+  */
+  GPIO_InitStruct.Pin = Camera_exposure_signal_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(Camera_exposure_signal_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitTypeDef output_gpio_init = {.Mode = GPIO_MODE_AF_PP,
+                                       .Speed = GPIO_SPEED_FREQ_HIGH,
+                                       .Pull = GPIO_NOPULL,
+                                       .Pin = GPIO_PIN_3};
+  HAL_GPIO_Init(GPIOB, &output_gpio_init);
+  __HAL_AFIO_REMAP_TIM2_PARTIAL_1();
+  /* TIM2 DMA Init */
+  /* TIM2_UP Init */
+  hdma_tim2_up.Instance = DMA1_Channel2;
+  hdma_tim2_up.Init.Direction = DMA_PERIPH_TO_MEMORY;
+  hdma_tim2_up.Init.PeriphInc = DMA_PINC_DISABLE;
+  hdma_tim2_up.Init.MemInc = DMA_MINC_ENABLE;
+  hdma_tim2_up.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+  hdma_tim2_up.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+  hdma_tim2_up.Init.Mode = DMA_NORMAL;
+  hdma_tim2_up.Init.Priority = DMA_PRIORITY_VERY_HIGH;
+  if (HAL_DMA_Init(&hdma_tim2_up) != HAL_OK)
     {
       _Error_Handler(__FILE__, __LINE__);
     }

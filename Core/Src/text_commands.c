@@ -139,11 +139,11 @@ void text_register_commands() {
   text_register_command("g_filter", 0, command_get_filter_callback);
 
   text_register_command("commit", 0, command_commit_parameters_callback);
-  
+
   text_register_command("arm_trigger", 0, command_arm_trigger_callback);
   text_register_command("disarm_trigger", 0, command_cancel_trigger_callback);
   text_register_command("g_trigger", 0, command_get_trigger_callback);
 
-  text_register_command("s_power", 1, command_set_power_callback);
-  text_register_command("g_power", 0, command_get_power_callback);
+  //  text_register_command("s_power", 1, command_set_power_callback);
+  //  text_register_command("g_power", 0, command_get_power_callback);
 }
