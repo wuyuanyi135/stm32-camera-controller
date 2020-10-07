@@ -122,6 +122,13 @@ void command_get_power_callback(text_command *cmd) {
   text_feedback(cmd->command, reply);
 }
 
+void command_toggle_polarity_callback(text_command *cmd) {
+  char reply[TEXT_MAX_REPLY_BYTES];
+  param_polarity = !param_polarity;
+  sprintf(reply, "polarity=%d", param_polarity);
+  text_feedback(cmd->command, reply);
+}
+
 void text_register_commands() {
   text_register_command("ping", 0, ping_cb);
   text_register_command("ping1", 1, ping1_cb);
@@ -144,6 +151,7 @@ void text_register_commands() {
   text_register_command("disarm_trigger", 0, command_cancel_trigger_callback);
   text_register_command("g_trigger", 0, command_get_trigger_callback);
 
+  text_register_command("toggle_polarity", 0, command_toggle_polarity_callback);
   //  text_register_command("s_power", 1, command_set_power_callback);
   //  text_register_command("g_power", 0, command_get_power_callback);
 }
